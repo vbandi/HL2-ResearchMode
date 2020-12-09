@@ -62,9 +62,6 @@ public class SensorTest : MonoBehaviour
     Text text;
 
     [SerializeField]
-    public bool dump = false;
-
-    [SerializeField]
     PointCloudVisualizer PointCloudVisualizer;
 
     public Interactable ContinuousPointCloudToggle;
@@ -82,7 +79,6 @@ public class SensorTest : MonoBehaviour
 #endif
         mediaMaterial = previewPlane.GetComponent<MeshRenderer>().material;
         previewPlane.SetActive(false);
-        DumpToggle.OnClick.AddListener(() => dump = DumpToggle.IsToggled);
     }
 
     #region Button Events
@@ -121,11 +117,11 @@ public class SensorTest : MonoBehaviour
     public void ShowParticles()
     {
         ContinuousPointCloudToggle.IsToggled = false;
-        ShowParticlesInternal();
+        ShowParticlesInternal(DumpToggle.IsToggled);
 
     }
 
-    private void ShowParticlesInternal()
+    private void ShowParticlesInternal(bool dump)
     {
 #if ENABLE_WINMD_SUPPORT
         var pointCloud = researchMode.GetPointCloudBuffer();
@@ -162,7 +158,7 @@ public class SensorTest : MonoBehaviour
 
         if (ContinuousPointCloudToggle.IsToggled && researchMode.PointCloudUpdated())
         {
-            ShowParticlesInternal();
+            ShowParticlesInternal(false);
         }
 
         // update depth map texture
