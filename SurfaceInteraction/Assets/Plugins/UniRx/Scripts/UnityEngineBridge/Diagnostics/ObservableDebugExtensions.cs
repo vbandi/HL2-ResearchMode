@@ -9,7 +9,7 @@ namespace UniRx.Diagnostics
         /// </summary>
         public static IObservable<T> Debug<T>(this IObservable<T> source, string label = null)
         {
-// #if DEBUG
+#if DEBUG
             var l = (label == null) ? "" : "[" + label + "]";
             return source.Materialize()
                 .Do(x => UnityEngine.Debug.Log(l + x.ToString()))
@@ -17,9 +17,9 @@ namespace UniRx.Diagnostics
                 .DoOnCancel(() => UnityEngine.Debug.Log(l + "OnCancel"))
                 .DoOnSubscribe(() => UnityEngine.Debug.Log(l + "OnSubscribe"));
 
-// #else
-//             return source;
-// #endif
+#else
+             return source;
+#endif
         }
 
         /// <summary>

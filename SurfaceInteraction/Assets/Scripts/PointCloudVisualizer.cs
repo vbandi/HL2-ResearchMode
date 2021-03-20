@@ -33,34 +33,17 @@ namespace DefaultNamespace
         
         private ParticleSystem.Particle[] _particles;
         private HashSet<Vector3> _closestPoints;
-
-        private Vector3 _initialCameraPosition;
-        private Quaternion _initialCameraRotation;
+        
+        // private Vector3 _initialCameraPosition;
+        // private Quaternion _initialCameraRotation;
         public Vector3 MiddlePoint;
 
         private void Awake()
         {
             _particleSystem = GetComponent<ParticleSystem>();
 
-            _initialCameraPosition = Camera.main.transform.position;
-            _initialCameraRotation = Camera.main.transform.rotation;
-        }
-
-        [Button("Load Sample Data")]
-        private void LoadSampleData()
-        {
-            var sampleParticleData = SampleData.PointCloud.Split(',').Select(s => float.Parse(s)).ToArray();
-            int middleIndex = sampleParticleData.Length / 2 + 600;  //TODO: this is not how the middle is counted because there's a lot of variation between the number of points
-            middleIndex -= middleIndex % 3;
-
-            MiddlePoint = new Vector3(sampleParticleData[middleIndex], sampleParticleData[middleIndex + 1],
-                sampleParticleData[middleIndex + 2]);
-            
-            SetParticles(sampleParticleData, MiddlePoint);
-            transform.localPosition = _initialCameraPosition;
-            transform.localRotation = _initialCameraRotation;
-            
-            CalculateQuad(MiddlePoint);
+            // _initialCameraPosition = Camera.main.transform.position;
+            // _initialCameraRotation = Camera.main.transform.rotation;
         }
 
         public void CalculateQuad(Vector3 middlePoint)

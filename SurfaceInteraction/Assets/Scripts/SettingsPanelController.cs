@@ -33,37 +33,38 @@ public class SettingsPanelController : MonoBehaviour
         _researchModeData.LoadSampleData(Camera.main.transform.position);
     }
 #endif
-    
-    void Start()
+
+    private void Start()
     {
         _mediaMaterial = Preview.GetComponent<MeshRenderer>().material;
         _researchModeData = new ObservableResearchModeData();
 
-        _researchModeData.CenterDistance.Debug("Center distance").Subscribe();
-
         DepthSensorToggle.OnClick.AddListener(HandleDepthSensorToggle);
         
-        PreviewToggle.ObserveIsToggled().Subscribe(b =>
-        {
-            if (b)
-                _previewSubscription = _researchModeData.DepthMapTexture.Subscribe(HandleDepthMapTextureReceived);
-            else
-                _previewSubscription?.Dispose();
-            
-            Preview.SetActive(b);
-        }).AddTo(this);
+        PreviewToggle.ObserveIsToggled().Subscribe(HandlePreviewToggled).AddTo(this);
 
-        ContinuousToggle.ObserveIsToggled().Subscribe(b =>
-        {
-            if (b)
-                _pointCloudSubscription = _researchModeData.PointCloud.Subscribe(HandlePointCloudReceived);
-            else
-                _pointCloudSubscription?.Dispose();
-        }).AddTo(this);
+        ContinuousToggle.ObserveIsToggled().Subscribe(HandleContinuousToggled).AddTo(this);
         
         _researchModeData.CenterDistance.SubscribeToText(Text, f => f.ToString("F4"));
         ShowPointCloudToggle.OnClick.AddListener(() => PointCloudVisualizer.ShowPointCloud = ShowPointCloudToggle.IsToggled);
-        
+    }
+
+    private void HandleContinuousToggled(bool b)
+    {
+        if (b)
+            _pointCloudSubscription = _researchModeData.PointCloud.Subscribe(HandlePointCloudReceived);
+        else
+            _pointCloudSubscription?.Dispose();
+    }
+
+    private void HandlePreviewToggled(bool b)
+    {
+        if (b)
+            _previewSubscription = _researchModeData.DepthMapTexture.Subscribe(HandleDepthMapTextureReceived);
+        else
+            _previewSubscription?.Dispose();
+
+        Preview.SetActive(b);
     }
 
     private void HandlePointCloudReceived((float[] points, Vector3 center) data)
