@@ -43,6 +43,7 @@ using System;
 using System.Runtime.InteropServices;
 using DefaultNamespace;
 using Microsoft.MixedReality.Toolkit.UI;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 #if ENABLE_WINMD_SUPPORT
@@ -66,6 +67,7 @@ public class SensorTest : MonoBehaviour
 
     public Interactable ContinuousPointCloudToggle;
     public Interactable DumpToggle;
+    public Interactable ShowPointCloud;
     
     private Material mediaMaterial = null;
     private Texture2D mediaTexture = null;
@@ -79,6 +81,21 @@ public class SensorTest : MonoBehaviour
 #endif
         mediaMaterial = previewPlane.GetComponent<MeshRenderer>().material;
         previewPlane.SetActive(false);
+        
+        ShowPointCloud.OnClick.AddListener(HandleShowPointCloudClicked);
+        ShowPointCloud.IsToggled = true;
+        HandleShowPointCloudClicked();
+    }
+
+    private void HandleShowPointCloudClicked()
+    {
+        var b = ShowPointCloud.IsToggled;
+        PointCloudVisualizer.ShowPointCloud = b;
+
+        if (b)
+            PointCloudVisualizer.ShowPoints();
+        else
+            PointCloudVisualizer.HidePoints();
     }
 
     #region Button Events
@@ -138,7 +155,13 @@ public class SensorTest : MonoBehaviour
         }
 
         if (PointCloudVisualizer != null)
-            PointCloudVisualizer.SetParticles(pointCloud);
+        {
+            var center = researchMode.GetCenterPoint();
+            var c = new Vector3(center[0], center[1], center[2]); 
+            PointCloudVisualizer.SetParticles(pointCloud, c);
+            PointCloudVisualizer.CalculateQuad(c);
+        }
+
 #endif
     }
 
