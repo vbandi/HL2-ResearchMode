@@ -1,15 +1,15 @@
 {
   "dependencies": {
     "com.microsoft.mixedreality.toolkit.foundation": {
-      "version": "file:MixedReality/com.microsoft.mixedreality.toolkit.foundation-2.6.0.tgz",
+      "version": "file:MixedReality/com.microsoft.mixedreality.toolkit.foundation-2.6.1.tgz",
       "depth": 0,
       "source": "local-tarball",
       "dependencies": {
-        "com.microsoft.mixedreality.toolkit.standardassets": "2.6.0"
+        "com.microsoft.mixedreality.toolkit.standardassets": "2.6.1"
       }
     },
     "com.microsoft.mixedreality.toolkit.standardassets": {
-      "version": "file:MixedReality/com.microsoft.mixedreality.toolkit.standardassets-2.6.0.tgz",
+      "version": "file:MixedReality/com.microsoft.mixedreality.toolkit.standardassets-2.6.1.tgz",
       "depth": 0,
       "source": "local-tarball",
       "dependencies": {
@@ -17,11 +17,11 @@
       }
     },
     "com.microsoft.mixedreality.toolkit.tools": {
-      "version": "file:MixedReality/com.microsoft.mixedreality.toolkit.tools-2.6.0.tgz",
+      "version": "file:MixedReality/com.microsoft.mixedreality.toolkit.tools-2.6.1.tgz",
       "depth": 0,
       "source": "local-tarball",
       "dependencies": {
-        "com.microsoft.mixedreality.toolkit.foundation": "2.6.0"
+        "com.microsoft.mixedreality.toolkit.foundation": "2.6.1"
       }
     },
     "com.microsoft.windows.mixedreality.dotnetwinrt": {

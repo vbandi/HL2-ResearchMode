@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "com.microsoft.mixedreality.toolkit.foundation": "file:MixedReality/com.microsoft.mixedreality.toolkit.foundation-2.6.0.tgz",
-    "com.microsoft.mixedreality.toolkit.standardassets": "file:MixedReality/com.microsoft.mixedreality.toolkit.standardassets-2.6.0.tgz",
-    "com.microsoft.mixedreality.toolkit.tools": "file:MixedReality/com.microsoft.mixedreality.toolkit.tools-2.6.0.tgz",
-    "com.microsoft.windows.mixedreality.dotnetwinrt": "file:MixedReality/com.microsoft.windows.mixedreality.dotnetwinrt-0.5.1052.tgz",
+    "com.microsoft.mixedreality.toolkit.foundation": "file:MixedReality\/com.microsoft.mixedreality.toolkit.foundation-2.6.1.tgz",
+    "com.microsoft.mixedreality.toolkit.standardassets": "file:MixedReality\/com.microsoft.mixedreality.toolkit.standardassets-2.6.1.tgz",
+    "com.microsoft.mixedreality.toolkit.tools": "file:MixedReality\/com.microsoft.mixedreality.toolkit.tools-2.6.1.tgz",
+    "com.microsoft.windows.mixedreality.dotnetwinrt": "file:MixedReality\/com.microsoft.windows.mixedreality.dotnetwinrt-0.5.1052.tgz",
     "com.unity.ide.rider": "3.0.5",
     "com.unity.ide.vscode": "1.2.3",
     "com.unity.test-framework": "1.1.22",
