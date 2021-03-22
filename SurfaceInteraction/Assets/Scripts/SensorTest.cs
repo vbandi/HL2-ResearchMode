@@ -157,26 +157,26 @@ public class SensorTest : MonoBehaviour
     private void ShowParticlesInternal(bool dump)
     {
 #if ENABLE_WINMD_SUPPORT
-        var pointCloud = researchMode.GetPointCloudBuffer();
-
-        if (dump)
-        {
-            Debug.Log($"Dumping point cloud of {pointCloud.Length / 3} points..." +
-                      $"-------");
-
-            Debug.Log(string.Join(", ", pointCloud));
-
-            Debug.Log($"-----" +
-                      $"Dump finished point cloud of {pointCloud.Length / 3} points...");
-        }
-
-        if (PointCloudVisualizer != null)
-        {
-            var center = researchMode.GetCenterPoint();
-            var c = new Vector3(center[0], center[1], center[2]); 
-            PointCloudVisualizer.SetParticles(pointCloud, c);
-            // PointCloudVisualizer.CalculateQuad(c);
-        }
+        // var pointCloud = researchMode.GetPointCloudBuffer();
+        //
+        // if (dump)
+        // {
+        //     Debug.Log($"Dumping point cloud of {pointCloud.Length / 3} points..." +
+        //               $"-------");
+        //
+        //     Debug.Log(string.Join(", ", pointCloud));
+        //
+        //     Debug.Log($"-----" +
+        //               $"Dump finished point cloud of {pointCloud.Length / 3} points...");
+        // }
+        //
+        // if (PointCloudVisualizer != null)
+        // {
+        //     var center = researchMode.GetCenterPoint();
+        //     var c = new Vector3(center[0], center[1], center[2]); 
+        //     PointCloudVisualizer.SetParticles(pointCloud, c);
+        //     // PointCloudVisualizer.CalculateQuad(c);
+        // }
 
 #endif
     }

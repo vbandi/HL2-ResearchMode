@@ -3,12 +3,12 @@ using DefaultNamespace;
 using Microsoft.MixedReality.Toolkit.UI;
 using NaughtyAttributes;
 using UniRx;
-using UniRx.Diagnostics;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SettingsPanelController : MonoBehaviour
 {
+   
     public Interactable DepthSensorToggle;
     public Interactable PreviewToggle;
     public Interactable ContinuousToggle;
@@ -62,11 +62,6 @@ public class SettingsPanelController : MonoBehaviour
         
         _researchModeData.CenterDistance.SubscribeToText(Text, f => f.ToString("F4"));
         ClearNormalsAndQuadsButton.OnClick.AddListener(HandleClearNormalsAndQuadsClicked);
-        
-        // DEBUG Stuff
-        _researchModeData.Center.Debug();
-        _researchModeData.SurfaceNormal.Debug();
-        _researchModeData.SurfaceQuad.Debug();
     }
 
     private void HandleShowNormalsToggled(bool b)
@@ -121,11 +116,8 @@ public class SettingsPanelController : MonoBehaviour
         Preview.SetActive(b);
     }
 
-    private void HandlePointCloudReceived((float[] points, Vector3 center) data)
+    private void HandlePointCloudReceived((Vector3[] points, Vector3 center) data)
     {
-        if (data.points == null)
-            return;
-
         PointCloudVisualizer.SetParticles(data.points, data.center);
     }
 

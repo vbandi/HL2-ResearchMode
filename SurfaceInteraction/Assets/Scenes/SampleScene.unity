@@ -2159,9 +2159,7 @@ MonoBehaviour:
   Size: 0.0025
   NormalSize: 0.1
   minTriangleSize: 0
-  numberOfClosesPointsForNormalCalculation: 1000
   numberOfTrianglesForNormal: 100
-  NormalLineRenderer: {fileID: 0}
   Quad: {fileID: 0}
   ShowPointCloud: 1
   MiddlePoint: {x: 0.1576541, y: -0.388234, z: 0.4070597}
