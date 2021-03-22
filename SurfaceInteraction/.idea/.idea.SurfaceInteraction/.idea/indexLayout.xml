@@ -5,7 +5,9 @@
     <explicitIncludes>
       <Path>Library/PackageCache/com.microsoft.mixedreality.toolkit.foundation@06de1895a161-1615196550667</Path>
       <Path>Library/PackageCache/com.microsoft.mixedreality.toolkit.standardassets@fa72dca13cc2-1615196547981</Path>
+      <Path>Library/PackageCache/com.microsoft.mixedreality.toolkit.tools@8252e55ec2de-1616242664508</Path>
       <Path>Library/PackageCache/com.microsoft.mixedreality.toolkit.tools@fc420216e94c-1615155683651</Path>
+      <Path>Library/PackageCache/com.microsoft.windows.mixedreality.dotnetwinrt@0b0137322b3a-1616242663483</Path>
       <Path>Library/PackageCache/com.unity.ext.nunit@1.0.6</Path>
       <Path>Library/PackageCache/com.unity.ide.rider@3.0.5</Path>
       <Path>Library/PackageCache/com.unity.ide.vscode@1.2.3</Path>

@@ -23,7 +23,7 @@ namespace DefaultNamespace
         public int numberOfClosesPointsForNormalCalculation = 100;
         public int numberOfTrianglesForNormal = 200;
 
-        public LineRenderer NormalLineRenderer;
+        // public LineRenderer NormalLineRenderer;
 
         public Transform Quad;
 
@@ -46,39 +46,39 @@ namespace DefaultNamespace
             // _initialCameraRotation = Camera.main.transform.rotation;
         }
 
-        public void CalculateQuad(Vector3 middlePoint)
-        {
-
-            if (_closestPoints.Count < numberOfClosesPointsForNormalCalculation / 3)
-                return;
-            
-            Normal = CalculateNormal(middlePoint, _closestPoints.ToArray());
-
-            if (Normal != null)
-            {
-                DrawNormal(middlePoint, Normal.Value);
-
-                Quad.position = middlePoint;
-                Quad.LookAt(middlePoint - Normal.Value);
-            }
-
-            var sumx = 0f;
-            var sumy = 0f;
-            var sumz = 0f;
-
-            foreach (var closestPoint in _closestPoints)
-            {
-                var point = Quad.InverseTransformPoint(closestPoint);
-                sumx += point.x;
-                sumy += point.y;
-                sumz += point.z;
-                // Debug.Log(point.z);
-            }
-
-            // Debug.Log($"avgx: {sumx / _closestPoints.Count}, avgy: {sumy / _closestPoints.Count}, avgz: {sumz / _closestPoints.Count}");
-
-            Quad.Translate(0, 0, sumz / _closestPoints.Count * Quad.localScale.z, Space.Self);
-        }
+        // public void CalculateQuad(Vector3 middlePoint)
+        // {
+        //
+        //     if (_closestPoints.Count < numberOfClosesPointsForNormalCalculation / 3)
+        //         return;
+        //     
+        //     Normal = CalculateNormal(middlePoint, _closestPoints.ToArray());
+        //
+        //     if (Normal != null)
+        //     {
+        //         DrawNormal(middlePoint, Normal.Value);
+        //
+        //         Quad.position = middlePoint;
+        //         Quad.LookAt(middlePoint - Normal.Value);
+        //     }
+        //
+        //     var sumx = 0f;
+        //     var sumy = 0f;
+        //     var sumz = 0f;
+        //
+        //     foreach (var closestPoint in _closestPoints)
+        //     {
+        //         var point = Quad.InverseTransformPoint(closestPoint);
+        //         sumx += point.x;
+        //         sumy += point.y;
+        //         sumz += point.z;
+        //         // Debug.Log(point.z);
+        //     }
+        //
+        //     // Debug.Log($"avgx: {sumx / _closestPoints.Count}, avgy: {sumy / _closestPoints.Count}, avgz: {sumz / _closestPoints.Count}");
+        //
+        //     Quad.Translate(0, 0, sumz / _closestPoints.Count * Quad.localScale.z, Space.Self);
+        // }
 
         public void ShowPoints()
         {
@@ -140,38 +140,38 @@ namespace DefaultNamespace
         }
         
 
-        public void DrawNormal(Vector3 start, Vector3 direction)
-        {
-            NormalLineRenderer.SetPositions(new[] {start, start + direction.normalized * NormalSize});
-        }
+        // public void DrawNormal(Vector3 start, Vector3 direction)
+        // {
+        //     NormalLineRenderer.SetPositions(new[] {start, start + direction.normalized * NormalSize});
+        // }
 
-        public Vector3 CalculateNormal(Vector3 center, Vector3[] points)
-        {
-            var result = new Vector3();
-
-            var axis = Camera.main.transform.position - center;
-            
-            // get numberOfTrianglesForNormal number of triangles with a minimum angle and side size
-            for (int i = 0; i < numberOfTrianglesForNormal; i++) 
-            {
-                var a = points[Random.Range(0, points.Length)];
-                var b = points[Random.Range(0, points.Length)];
-                var c = points[Random.Range(0, points.Length)];
-
-                var angle = Vector3.SignedAngle(a - c, a - b, axis);
-
-                // skip if triangle is not large enough
-                if (angle < 30 || angle > 120 || (a - b).magnitude < minTriangleSize || (a - c).magnitude < minTriangleSize ||
-                    (b - c).magnitude < minTriangleSize)
-                {
-                    i = i - 1;
-                    continue;
-                }
-
-                result += NormalOfTriangle(a, b, c);
-            }
-            return result.normalized;
-        }
+        // public Vector3 CalculateNormal(Vector3 center, Vector3[] points)
+        // {
+        //     var result = new Vector3();
+        //
+        //     var axis = Camera.main.transform.position - center;
+        //     
+        //     // get numberOfTrianglesForNormal number of triangles with a minimum angle and side size
+        //     for (int i = 0; i < numberOfTrianglesForNormal; i++) 
+        //     {
+        //         var a = points[Random.Range(0, points.Length)];
+        //         var b = points[Random.Range(0, points.Length)];
+        //         var c = points[Random.Range(0, points.Length)];
+        //
+        //         var angle = Vector3.SignedAngle(a - c, a - b, axis);
+        //
+        //         // skip if triangle is not large enough
+        //         if (angle < 30 || angle > 120 || (a - b).magnitude < minTriangleSize || (a - c).magnitude < minTriangleSize ||
+        //             (b - c).magnitude < minTriangleSize)
+        //         {
+        //             i = i - 1;
+        //             continue;
+        //         }
+        //
+        //         result += NormalOfTriangle(a, b, c);
+        //     }
+        //     return result.normalized;
+        // }
 
         public Vector3 NormalOfTriangle(Vector3 pointA, Vector3 pointB, Vector3 pointC)
         {

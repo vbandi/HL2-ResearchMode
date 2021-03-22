@@ -175,7 +175,7 @@ public class SensorTest : MonoBehaviour
             var center = researchMode.GetCenterPoint();
             var c = new Vector3(center[0], center[1], center[2]); 
             PointCloudVisualizer.SetParticles(pointCloud, c);
-            PointCloudVisualizer.CalculateQuad(c);
+            // PointCloudVisualizer.CalculateQuad(c);
         }
 
 #endif
