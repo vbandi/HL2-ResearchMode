@@ -1,5 +1,6 @@
 ﻿using System;
 using TMPro;
+using UniRx;
 using UnityEngine;
 
 public class Ruler : MonoBehaviour
@@ -13,6 +14,8 @@ public class Ruler : MonoBehaviour
     private void Start()
     {
         _line = GetComponent<LineRenderer>();
+        MessageBroker.Default.Receive<ClearAllMessage>().Subscribe(_ => Clear());
+
     }
 
     private void Update()
@@ -33,5 +36,13 @@ public class Ruler : MonoBehaviour
 
         Label.transform.position = From + (Vector3.up * 0.05f);
         Label.text = (distance * 100).ToString("F1");
+    }
+
+    public void Clear()
+    {
+        From = Vector3.zero;
+        To = Vector3.zero;
+        _line.enabled = false;
+        Label.text = "";
     }
 }

@@ -43,6 +43,8 @@ public class SurfaceTouchObserver : MonoBehaviour
         _line = GetComponent<LineRenderer>();
 
         this.ObserveEveryValueChanged(x => x._mouseStatus).Subscribe(s => Debug.Log($"Mouse Status: {s}"));
+
+        MessageBroker.Default.Receive<ClearAllMessage>().Subscribe(_ => Clear());
     }
 
     private void Update()
@@ -73,7 +75,7 @@ public class SurfaceTouchObserver : MonoBehaviour
         var hasHit = Physics.Raycast(palmPose.Position, -palmPose.Up,
             out var raycastResult, PalmDistanceFromSurfaceForMouseToAppear, _spatialAwarenessLayerId);
 
-        var isGrabbed = hasHit && raycastResult.distance < PalmDistanceFromSurfaceForGrab;
+        var isGrabbed = raycastResult.distance < PalmDistanceFromSurfaceForGrab;
         
         var thumbDistance = palmPlane.GetDistanceToPoint(thumbTipPose.Position);
         var indexDistance = palmPlane.GetDistanceToPoint(indexTipPose.Position);
@@ -106,16 +108,17 @@ public class SurfaceTouchObserver : MonoBehaviour
             case VirtualMouseStatus.Grabbed:
                 SetMousePosition(palmPose, false);
                 Pointer.SetActive(isGrabbed);
+
                 if (!isGrabbed)
+                {
                     _mouseStatus = VirtualMouseStatus.Visible;
+                }
 
                 if (isGrabbed && isMouseDown)
                     _mouseStatus = VirtualMouseStatus.ButtonPressed; 
                 break;
             case VirtualMouseStatus.ButtonPressed:
                 SetMousePosition(palmPose, false);
-                
-                LeftButton.EnsureComponent<MaterialInstance>().Material.color = isMouseDown ? Color.white : Color.gray;
                 
                 // Step 3: identify spatial mesh plane at the above intersection
                 if (isMouseDown)
@@ -139,6 +142,9 @@ public class SurfaceTouchObserver : MonoBehaviour
             default:
                 throw new ArgumentOutOfRangeException();
         }
+        
+        LeftButton.EnsureComponent<MaterialInstance>().Material.color = 
+            _mouseStatus == VirtualMouseStatus.ButtonPressed ? Color.white : Color.gray;
     }
 
     private void SetMousePosition(MixedRealityPose palmPose, bool setRotation)
@@ -172,6 +178,13 @@ public class SurfaceTouchObserver : MonoBehaviour
 
         result.DoOnTerminate(subscription.Dispose);
         return result;
+    }
+
+    public void Clear()
+    {
+        points.Clear();
+        _line.positionCount = 0;
+        _line.SetPositions(points.ToArray());
     }
 }
 

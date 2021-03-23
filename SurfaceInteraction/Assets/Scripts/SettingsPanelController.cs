@@ -96,6 +96,8 @@ public class SettingsPanelController : MonoBehaviour
     {
         for (var i = 0; i < SurfaceIndicatorRoot.childCount; i++)
             Destroy(SurfaceIndicatorRoot.GetChild(i).gameObject);
+
+        MessageBroker.Default.Publish(new ClearAllMessage());
     }
 
     private void HandleContinuousToggled(bool b)
