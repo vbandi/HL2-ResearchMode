@@ -151,10 +151,12 @@ public class SurfaceTouchObserver : MonoBehaviour
     {
         Mouse.transform.position = _meshPlane.ClosestPointOnPlane(palmPose.Position);
         
-        
-        // TODO: doesn't work on vertical surfaces
         if (setRotation)
-            Mouse.transform.LookAt(Mouse.transform.position + Vector3.ProjectOnPlane(palmPose.Forward, _meshPlane.normal));
+        {
+            Mouse.transform.LookAt(
+                Mouse.transform.position + Vector3.ProjectOnPlane(palmPose.Forward, _meshPlane.normal),
+                _meshPlane.normal);
+        }
     }
 
 
