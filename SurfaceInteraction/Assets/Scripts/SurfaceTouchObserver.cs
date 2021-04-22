@@ -145,6 +145,10 @@ public class SurfaceTouchObserver : MonoBehaviour
         
         LeftButton.EnsureComponent<MaterialInstance>().Material.color = 
             _mouseStatus == VirtualMouseStatus.ButtonPressed ? Color.white : Color.gray;
+
+        PointerUtils.SetHandRayPointerBehavior(_mouseStatus == VirtualMouseStatus.None
+            ? PointerBehavior.Default
+            : PointerBehavior.AlwaysOff);
     }
 
     private void SetMousePosition(MixedRealityPose palmPose, bool setRotation)
