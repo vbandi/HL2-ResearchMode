@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DefaultNamespace;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.Rendering;
@@ -8,7 +9,7 @@ using Microsoft.MixedReality.Toolkit.Utilities;
 using UniRx;
 using UnityEngine;
 
-public class SurfaceTouchObserver : MonoBehaviour
+public class VirtualMouseController : MonoBehaviour
 {
     private IObservable<MixedRealityPose?> _observableIndexTipPose;
     private IObservable<MixedRealityPose?> _observableIndexMiddleJointPose;
@@ -16,8 +17,10 @@ public class SurfaceTouchObserver : MonoBehaviour
     private int _spatialAwarenessLayerId;
 
     private LineRenderer _line;
+
     public float PalmDistanceFromSurfaceForMouseToAppear;
     public float PalmDistanceFromSurfaceForGrab;
+    public float MouseDownPalmDistanceThreshold = 0.01f;
 
     public GameObject Mouse;
     public GameObject LeftButton;
@@ -26,7 +29,6 @@ public class SurfaceTouchObserver : MonoBehaviour
     public Ruler Ruler;
     
     private Plane _meshPlane;
-    public float MouseDownPalmDistanceThreshold = 0.01f;
 
     private List<Vector3> points = new List<Vector3>();
 
@@ -35,8 +37,8 @@ public class SurfaceTouchObserver : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        _observableIndexTipPose = JointToObservable(Handedness.Right, TrackedHandJoint.IndexTip);
-        _observableIndexMiddleJointPose = JointToObservable(Handedness.Right, TrackedHandJoint.IndexMiddleJoint);
+        _observableIndexTipPose = HandObserver.JointToObservable(Handedness.Right, TrackedHandJoint.IndexTip);
+        _observableIndexMiddleJointPose = HandObserver.JointToObservable(Handedness.Right, TrackedHandJoint.IndexMiddleJoint);
 
         _spatialAwarenessLayerId = LayerMask.GetMask("Spatial Awareness");
 
@@ -161,29 +163,6 @@ public class SurfaceTouchObserver : MonoBehaviour
                 Mouse.transform.position + Vector3.ProjectOnPlane(palmPose.Forward, _meshPlane.normal),
                 _meshPlane.normal);
         }
-    }
-
-
-    private Subject<MixedRealityPose?> JointToObservable(Handedness handedness, TrackedHandJoint joint)
-    {
-        var result = new Subject<MixedRealityPose?>();
-
-        var subscription = Observable.EveryUpdate().Subscribe(_ =>
-        {
-            var hand = HandJointUtils.FindHand(handedness);
-
-            if (hand != null && hand.TryGetJoint(joint, out var pose))
-            {
-                result.OnNext(pose);
-            }
-            else
-            {
-                result.OnNext(null);
-            }
-        });
-
-        result.DoOnTerminate(subscription.Dispose);
-        return result;
     }
 
     public void Clear()

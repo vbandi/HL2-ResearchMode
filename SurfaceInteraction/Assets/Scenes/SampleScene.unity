@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2359,7 +2359,6 @@ ParticleSystemRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: df19e04948525574ab56a61057bbb3a2, type: 2}
-  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -10046,7 +10045,7 @@ GameObject:
   - component: {fileID: 1478990706}
   - component: {fileID: 1478990708}
   m_Layer: 0
-  m_Name: SurfaceTouch
+  m_Name: VirtualMouse
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10066,11 +10065,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PalmDistanceFromSurfaceForMouseToAppear: 0.2
   PalmDistanceFromSurfaceForGrab: 0.08
+  MouseDownPalmDistanceThreshold: 0.04
   Mouse: {fileID: 914518136}
   LeftButton: {fileID: 2083822871}
   Pointer: {fileID: 250604161}
   Ruler: {fileID: 1384047820}
-  MouseDownPalmDistanceThreshold: 0.04
 --- !u!4 &1478990707
 Transform:
   m_ObjectHideFlags: 0
