@@ -20,7 +20,7 @@ public class VirtualMouseController : MonoBehaviour
 
     public float PalmDistanceFromSurfaceForMouseToAppear;
     public float PalmDistanceFromSurfaceForGrab;
-    public float MouseDownPalmDistanceThreshold = 0.01f;
+    public float MouseDownSurfaceDistanceThreshold = 0.015f;
 
     public GameObject Mouse;
     public GameObject LeftButton;
@@ -28,7 +28,7 @@ public class VirtualMouseController : MonoBehaviour
 
     public Ruler Ruler;
     
-    private Plane _meshPlane;
+    private Plane? _meshPlane;
 
     private List<Vector3> points = new List<Vector3>();
 
@@ -78,14 +78,8 @@ public class VirtualMouseController : MonoBehaviour
             out var raycastResult, PalmDistanceFromSurfaceForMouseToAppear, _spatialAwarenessLayerId);
 
         var isGrabbed = raycastResult.distance < PalmDistanceFromSurfaceForGrab;
-        
-        var thumbDistance = palmPlane.GetDistanceToPoint(thumbTipPose.Position);
-        var indexDistance = palmPlane.GetDistanceToPoint(indexTipPose.Position);
-        var middleDistance = palmPlane.GetDistanceToPoint(middleTipPose.Position);
-        var ringDistance = palmPlane.GetDistanceToPoint(ringTipPose.Position);
-        var pinkyDistance = palmPlane.GetDistanceToPoint(pinkyTipPose.Position);
 
-        bool isMouseDown = indexDistance < -MouseDownPalmDistanceThreshold;
+        bool isMouseDown = _meshPlane.HasValue && _meshPlane.Value.GetDistanceToPoint(indexTipPose.Position) < MouseDownSurfaceDistanceThreshold;
 
         switch (_mouseStatus)
         {
@@ -97,7 +91,10 @@ public class VirtualMouseController : MonoBehaviour
                 break;
             case VirtualMouseStatus.Visible:
                 if (!hasHit)
+                {
+                    _meshPlane = null;
                     _mouseStatus = VirtualMouseStatus.None;
+                }
                 else
                 {
                     _meshPlane = new Plane(raycastResult.normal, raycastResult.point);
@@ -155,13 +152,13 @@ public class VirtualMouseController : MonoBehaviour
 
     private void SetMousePosition(MixedRealityPose palmPose, bool setRotation)
     {
-        Mouse.transform.position = _meshPlane.ClosestPointOnPlane(palmPose.Position);
+        Mouse.transform.position = _meshPlane.Value.ClosestPointOnPlane(palmPose.Position);
         
         if (setRotation)
         {
             Mouse.transform.LookAt(
-                Mouse.transform.position + Vector3.ProjectOnPlane(palmPose.Forward, _meshPlane.normal),
-                _meshPlane.normal);
+                Mouse.transform.position + Vector3.ProjectOnPlane(palmPose.Forward, _meshPlane.Value.normal),
+                _meshPlane.Value.normal);
         }
     }
 
