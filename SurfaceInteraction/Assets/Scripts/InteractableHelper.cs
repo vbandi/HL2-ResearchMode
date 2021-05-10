@@ -32,4 +32,9 @@ public static class InteractableHelper
     {
         return interactable.ObserveEveryValueChanged(t => t.IsToggled);
     }
+
+    public static IObservable<int> ObserveCurrentDimension(this Interactable interactable)
+    {
+        return interactable.ObserveEveryValueChanged(t => t.CurrentDimension);
+    }
 }

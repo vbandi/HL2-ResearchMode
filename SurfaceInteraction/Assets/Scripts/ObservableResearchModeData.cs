@@ -38,6 +38,8 @@ public class ObservableResearchModeData : IDisposable
     public int NumberOfClosesPointsForNormalCalculation = 10000;
     public int NumberOfTrianglesForNormal = 1000;
 
+    public bool PauseSurfaceQuadCalculation = false;
+
     public Subject<float> CenterDistance { get; } = new Subject<float>();
 
     public Subject<Vector3> Center { get; } = new Subject<Vector3>();
@@ -135,7 +137,7 @@ public class ObservableResearchModeData : IDisposable
         var normal = CalculateNormal(center, closestPoints, MinTriangleSize);
         SurfaceNormal.OnNext((center, normal));
 
-        if (!SurfaceQuad.HasObservers)
+        if (!SurfaceQuad.HasObservers || PauseSurfaceQuadCalculation)
             return;
 
         var quad = SurfaceQuadFactory.Invoke();

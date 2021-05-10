@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Linq;
 using DefaultNamespace;
+using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.UI;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using NaughtyAttributes;
 using UniRx;
 using UnityEngine;
@@ -18,6 +22,7 @@ public class SettingsPanelController : MonoBehaviour
     public Interactable ShowNormalsToggle;
     public Interactable ShowQuadsToggle;
     public Interactable ClearNormalsAndQuadsButton;
+    public Interactable ModeSelectorButton;
 
     public Transform SurfaceIndicatorRoot;
 
@@ -28,6 +33,8 @@ public class SettingsPanelController : MonoBehaviour
     public GameObject Preview;
 
     public PointCloudVisualizer PointCloudVisualizer;
+    
+    public GameObject[] Modes;
 
     private Material _mediaMaterial = null;
     private Texture2D _mediaTexture = null;
@@ -62,6 +69,26 @@ public class SettingsPanelController : MonoBehaviour
         
         _researchModeData.CenterDistance.SubscribeToText(Text, f => f.ToString("F4"));
         ClearNormalsAndQuadsButton.OnClick.AddListener(HandleClearNormalsAndQuadsClicked);
+
+        ModeSelectorButton.NumOfDimensions = Modes.Length;
+
+        Observable.EveryUpdate().Subscribe(_ =>
+            _researchModeData.PauseSurfaceQuadCalculation = HandJointUtils.FindHand(Handedness.Any) != null);
+        
+        foreach (GameObject mode in Modes)
+            mode.SetActive(false);
+
+        ModeSelectorButton.ObserveCurrentDimension().Select(x => Modes[x]).Pairwise().Subscribe(ChangeMode);
+        ChangeMode(new Pair<GameObject>(null, Modes[0]));
+    }
+
+    private void ChangeMode(Pair<GameObject> pair)
+    {
+        if (!(pair.Previous is null))
+            pair.Previous.SetActive(false);
+
+        pair.Current.SetActive(true);
+        ModeSelectorButton.GetComponent<ButtonConfigHelper>().MainLabelText = pair.Current.name;
     }
 
     private void HandleShowNormalsToggled(bool b)

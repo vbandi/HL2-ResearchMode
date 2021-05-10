@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using DefaultNamespace;
 using Microsoft.MixedReality.Toolkit;
@@ -9,14 +8,12 @@ using Microsoft.MixedReality.Toolkit.Utilities;
 using UniRx;
 using UnityEngine;
 
-public class VirtualMouseController : MonoBehaviour
+public class VirtualMouseController : SurfaceDrawerBase
 {
     private IObservable<MixedRealityPose?> _observableIndexTipPose;
     private IObservable<MixedRealityPose?> _observableIndexMiddleJointPose;
 
     private int _spatialAwarenessLayerId;
-
-    private LineRenderer _line;
 
     public float PalmDistanceFromSurfaceForMouseToAppear;
     public float PalmDistanceFromSurfaceForGrab;
@@ -26,13 +23,10 @@ public class VirtualMouseController : MonoBehaviour
     public GameObject LeftButton;
     public GameObject Pointer;
 
-    public Ruler Ruler;
-    
     private Plane? _meshPlane;
 
-    private List<Vector3> points = new List<Vector3>();
-
     private VirtualMouseStatus _mouseStatus = VirtualMouseStatus.None; 
+    
 
     // Start is called before the first frame update
     private void Start()
@@ -122,15 +116,7 @@ public class VirtualMouseController : MonoBehaviour
                 // Step 3: identify spatial mesh plane at the above intersection
                 if (isMouseDown)
                 {
-                    points.Add(Pointer.transform.position);
-                    _line.positionCount = points.Count;
-                    _line.SetPositions(points.ToArray());
-
-                    if (points.Any())
-                    {
-                        Ruler.From = points.First();
-                        Ruler.To = points.Last();
-                    }
+                    AddPoint(Pointer.transform.position);
                 }
                 else
                 {
