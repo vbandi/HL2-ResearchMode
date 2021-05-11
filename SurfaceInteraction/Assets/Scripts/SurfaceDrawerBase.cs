@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ public class SurfaceDrawerBase : MonoBehaviour
     public Ruler Ruler;
     protected readonly List<Vector3> points = new List<Vector3>();
     protected LineRenderer _line;
+    protected int spatialAwarenessLayerId;
 
     protected void AddPoint(Vector3 point)
     {
@@ -19,5 +21,10 @@ public class SurfaceDrawerBase : MonoBehaviour
             Ruler.From = points.First();
             Ruler.To = points.Last();
         }
+    }
+
+    private void Awake()
+    {
+        spatialAwarenessLayerId = LayerMask.GetMask("Spatial Awareness");
     }
 }

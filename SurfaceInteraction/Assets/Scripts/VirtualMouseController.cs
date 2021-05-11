@@ -13,8 +13,6 @@ public class VirtualMouseController : SurfaceDrawerBase
     private IObservable<MixedRealityPose?> _observableIndexTipPose;
     private IObservable<MixedRealityPose?> _observableIndexMiddleJointPose;
 
-    private int _spatialAwarenessLayerId;
-
     public float PalmDistanceFromSurfaceForMouseToAppear;
     public float PalmDistanceFromSurfaceForGrab;
     public float MouseDownSurfaceDistanceThreshold = 0.015f;
@@ -33,8 +31,6 @@ public class VirtualMouseController : SurfaceDrawerBase
     {
         _observableIndexTipPose = HandObserver.JointToObservable(Handedness.Right, TrackedHandJoint.IndexTip);
         _observableIndexMiddleJointPose = HandObserver.JointToObservable(Handedness.Right, TrackedHandJoint.IndexMiddleJoint);
-
-        _spatialAwarenessLayerId = LayerMask.GetMask("Spatial Awareness");
 
         _line = GetComponent<LineRenderer>();
 
@@ -69,7 +65,7 @@ public class VirtualMouseController : SurfaceDrawerBase
 
         // Step 1: cast ray from palm DOWN, and find intersection with spatial mesh
         var hasHit = Physics.Raycast(palmPose.Position, -palmPose.Up,
-            out var raycastResult, PalmDistanceFromSurfaceForMouseToAppear, _spatialAwarenessLayerId);
+            out var raycastResult, PalmDistanceFromSurfaceForMouseToAppear, spatialAwarenessLayerId);
 
         var isGrabbed = raycastResult.distance < PalmDistanceFromSurfaceForGrab;
 

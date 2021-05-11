@@ -6,20 +6,16 @@ using NaughtyAttributes;
 using UniRx;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.XR.WSA.Input;
 
 namespace DefaultNamespace
 {
-    public class PalmRayController : SurfaceDrawerBase, IMixedRealitySpeechHandler
+    public class PalmRayController : SurfaceDrawerWithPointer, IMixedRealitySpeechHandler
     {
         private IObservable<MixedRealityPose?> _observablePalmPose;
-        private int _spatialAwarenessLayerId;
         private Vector3 _handForwardOnMeshPlane;
 
         public float MaxPalmDistanceFromSurface = 0.2f;
         public float PinchThreshold = 0.1f;
-        public GameObject Pointer;
-        public Vector3 PointerOffset;
 
         private Plane? _meshPlane;
 
@@ -34,18 +30,11 @@ namespace DefaultNamespace
         
         private void Start()
         {
-            _spatialAwarenessLayerId = LayerMask.GetMask("Spatial Awareness");
             _observablePalmPose = HandObserver.JointToObservable(Handedness.Right, TrackedHandJoint.Palm);
-            _observablePalmPose.Subscribe(HandlePalmPoseChanged);
+            _observablePalmPose.Where(_ => isActiveAndEnabled).Subscribe(HandlePalmPoseChanged);
             
             CoreServices.InputSystem.RegisterHandler<IMixedRealitySpeechHandler>(this);
-
-            Observable.EveryUpdate().Where(_ => isActiveAndEnabled).Subscribe(_ => PointerUtils.SetHandRayPointerBehavior(Pointer.activeInHierarchy
-                ? PointerBehavior.AlwaysOff
-                : PointerBehavior.Default));
-            
-            _line = GetComponent<LineRenderer>();
-
+            Init();
             // _filter = new OneEuroFilter2();
         }
 
@@ -63,7 +52,7 @@ namespace DefaultNamespace
             if (!isDrawing)
             {
                 var hasHit = Physics.Raycast(palmPose.Value.Position, -palmPose.Value.Up, out var hit,
-                    MaxPalmDistanceFromSurface, _spatialAwarenessLayerId);
+                    MaxPalmDistanceFromSurface, spatialAwarenessLayerId);
 
                 Pointer.SetActive(hasHit);
 
@@ -102,8 +91,6 @@ namespace DefaultNamespace
             //     Quaternion.LookRotation(_handForwardOnMeshPlane, _meshPlane.Value.normal));
 
             Pointer.transform.position = closestPoint;
-            // Pointer.transform.LookAt(Pointer.transform.position + _handForwardOnMeshPlane, _meshPlane.Value.normal);
-            // Pointer.transform.SetPositionAndRotation(closestPoint, Quaternion.LookRotation(_handForwardOnMeshPlane, _meshPlane.Value.normal));
 
             if (!isDrawing)
             {
@@ -128,14 +115,6 @@ namespace DefaultNamespace
         {
             return HandJointUtils.FindHand(hand)?.TrackingState == TrackingState.Tracked
                    && HandPoseUtils.CalculateIndexPinch(hand) > PinchThreshold;
-        }
-
-        private void OnDrawGizmos()
-        {
-            if (_meshPlane == null)
-                return;
-
-            Gizmos.DrawLine(Pointer.transform.position, Pointer.transform.position + (_meshPlane.Value.normal));
         }
 
         /// <inheritdoc />
