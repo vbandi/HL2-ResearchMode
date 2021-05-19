@@ -12,7 +12,8 @@ using UnityEngine.UI;
 
 public class SettingsPanelController : MonoBehaviour
 {
-   
+
+    public Interactable SpatialMeshToggle;
     public Interactable DepthSensorToggle;
     public Interactable PreviewToggle;
     public Interactable ContinuousToggle;
@@ -70,6 +71,8 @@ public class SettingsPanelController : MonoBehaviour
         _researchModeData.CenterDistance.SubscribeToText(Text, f => f.ToString("F4"));
         ClearNormalsAndQuadsButton.OnClick.AddListener(HandleClearNormalsAndQuadsClicked);
 
+        SpatialMeshToggle.ObserveIsToggled().Subscribe(HandleSpatialMeshToggled);
+
         ModeSelectorButton.NumOfDimensions = Modes.Length;
 
         Observable.EveryUpdate().Subscribe(_ =>
@@ -80,6 +83,25 @@ public class SettingsPanelController : MonoBehaviour
 
         ModeSelectorButton.ObserveCurrentDimension().Select(x => Modes[x]).Pairwise().Subscribe(ChangeMode);
         ChangeMode(new Pair<GameObject>(null, Modes[0]));
+    }
+
+    private void HandleSpatialMeshToggled(bool b)
+    {
+        if (b)
+        {
+            ShowQuadsToggle.IsToggled = false;
+            ShowNormalsToggle.IsToggled = false;
+            ShowPointCloudToggle.IsToggled = false;
+            ContinuousToggle.IsToggled = false;
+            PreviewToggle.IsToggled = false;
+            DepthSensorToggle.IsToggled = false;
+            HandleClearNormalsAndQuadsClicked();
+            CoreServices.SpatialAwarenessSystem.Enable();
+        }
+        else
+        {
+            CoreServices.SpatialAwarenessSystem.Disable();
+        }
     }
 
     private void ChangeMode(Pair<GameObject> pair)
