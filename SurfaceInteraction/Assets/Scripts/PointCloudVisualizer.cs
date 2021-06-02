@@ -83,12 +83,12 @@ namespace DefaultNamespace
             var size = points.Length / 3;
 
             var comparer = new DistanceComparer(middle);
-            var result = new SortedSet<Vector3>(comparer);
+            var result = new SortedSet<Vector3>(comparer);  // TODO: orderby is much faster. Or KDTree is even better
 
             for (int i = 0; i < size; i++)
             {
                 int xIndex = i * 3;
-                result.Add(new Vector3(points[xIndex], points[xIndex + 1], points[xIndex + 2]));
+                result.Add(new Vector3(points[xIndex], points[xIndex + 1], points[xIndex + 2]));  
             }
 
             return result.Take(count);

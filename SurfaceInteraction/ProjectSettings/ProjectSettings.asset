@@ -626,7 +626,7 @@ PlayerSettings:
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
   metroPackageName: SurfaceInteraction
-  metroPackageVersion: 1.0.79.0
+  metroPackageVersion: 1.0.85.0
   metroCertificatePath: Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
   metroCertificateSubject: DefaultCompany

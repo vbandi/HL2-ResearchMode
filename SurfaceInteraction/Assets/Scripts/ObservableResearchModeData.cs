@@ -256,7 +256,7 @@ public class ObservableResearchModeData : IDisposable
     }
 
     
-    private Vector3[] GetClosestPoints(Vector3 middle, Vector3[] points, int count)
+    public static Vector3[] GetClosestPoints(Vector3 middle, Vector3[] points, int count)
     {
         Profiler.BeginSample(nameof(GetClosestPoints));
         var size = points.Length / 3;
@@ -297,6 +297,6 @@ public class DistanceComparer : IComparer<Vector3>
 
     public int Compare(Vector3 x, Vector3 y)
     {
-        return (x - _origin).magnitude.CompareTo((y - _origin).magnitude);
+        return (x - _origin).sqrMagnitude.CompareTo((y - _origin).sqrMagnitude);
     }
 }
