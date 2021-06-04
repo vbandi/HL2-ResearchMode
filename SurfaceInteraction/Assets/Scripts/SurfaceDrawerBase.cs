@@ -10,7 +10,7 @@ public class SurfaceDrawerBase : MonoBehaviour
     protected LineRenderer _line;
     protected int spatialAwarenessLayerId;
 
-    protected void AddPoint(Vector3 point)
+    protected void AddPoint(Vector3 point, Plane plane)
     {
         points.Add(point);
         _line.positionCount = points.Count;
@@ -18,8 +18,7 @@ public class SurfaceDrawerBase : MonoBehaviour
 
         if (points.Any())
         {
-            Ruler.From = points.First();
-            Ruler.To = points.Last();
+            Ruler.SetPoints(points.First(), points.Last(), plane);
         }
     }
 

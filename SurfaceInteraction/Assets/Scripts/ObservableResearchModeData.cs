@@ -22,6 +22,12 @@ public class ObservableResearchModeData : IDisposable
 #if ENABLE_WINMD_SUPPORT
     private HL2ResearchMode _researchMode;
 #endif
+    
+    private static ObservableResearchModeData _instance;
+    public static ObservableResearchModeData Instance => _instance ?? (_instance = new ObservableResearchModeData());
+    
+    private ObservableResearchModeData()
+    {}
 
     private CompositeDisposable _subscriptions;
     
@@ -96,9 +102,17 @@ public class ObservableResearchModeData : IDisposable
         _subscriptions = new CompositeDisposable();
 
         Debug.Log($"Starting research mode at {DateTime.Now}");
-        
-        _researchMode = new HL2ResearchMode();
-        _researchMode.InitializeDepthSensor();
+
+        try
+        {
+            _researchMode = new HL2ResearchMode();
+            _researchMode.InitializeDepthSensor();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"ERRRROOOORRR: '{ex.Message}'");
+            throw;
+        }
 
         Debug.Log($"Started research mode at {DateTime.Now}");
         Debug.Log($"Depth Extrinsics: {_researchMode.PrintDepthExtrinsics()}");
@@ -284,6 +298,7 @@ public class ObservableResearchModeData : IDisposable
     public void Dispose()
     {
         Stop();
+        _instance = null;
     }
 }
 

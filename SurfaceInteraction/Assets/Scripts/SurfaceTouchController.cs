@@ -72,7 +72,7 @@ public class SurfaceTouchController : SurfaceDrawerWithPointer
                 _meshPlane.Value.normal);
             
             if (!_meshPlane.Value.SameSide(tip.Position, pose.Value.Position) || _meshPlane.Value.GetDistanceToPoint(tip.Position) < TouchDistance)
-                AddPoint(Pointer.transform.position);
+                AddPoint(Pointer.transform.position, _meshPlane.Value);
             else
                 points.Clear();
         }

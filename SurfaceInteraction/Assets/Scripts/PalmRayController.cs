@@ -102,7 +102,7 @@ namespace DefaultNamespace
             Pointer.transform.Translate(PointerOffset, Space.Self);
 
             if (isDrawing)
-                AddPoint(Pointer.transform.position);
+                AddPoint(Pointer.transform.position, _meshPlane.Value);
             else
             {
                 points.Clear();

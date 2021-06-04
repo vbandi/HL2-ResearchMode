@@ -14,6 +14,7 @@ public class SettingsPanelController : MonoBehaviour
 {
 
     public Interactable SpatialMeshToggle;
+    public Interactable MeshGeneratorToggle;
     public Interactable DepthSensorToggle;
     public Interactable PreviewToggle;
     public Interactable ContinuousToggle;
@@ -32,6 +33,7 @@ public class SettingsPanelController : MonoBehaviour
     
     public Text Text;
     public GameObject Preview;
+    public MeshGenerator _meshGenerator;
 
     public PointCloudVisualizer PointCloudVisualizer;
     
@@ -57,7 +59,7 @@ public class SettingsPanelController : MonoBehaviour
     private void Start()
     {
         _mediaMaterial = Preview.GetComponent<MeshRenderer>().material;
-        _researchModeData = new ObservableResearchModeData();
+        _researchModeData = ObservableResearchModeData.Instance;
 
         _researchModeData.SurfaceQuadFactory = () => Instantiate(SurfaceIndicator).transform;
 
@@ -67,6 +69,7 @@ public class SettingsPanelController : MonoBehaviour
         ShowNormalsToggle.ObserveIsToggled().Subscribe(HandleShowNormalsToggled).AddTo(this);
         ShowQuadsToggle.ObserveIsToggled().Subscribe(HandleShowQuadsToggled).AddTo(this);
         ShowPointCloudToggle.ObserveIsToggled().Subscribe(b => PointCloudVisualizer.ShowPointCloud = b).AddTo(this);
+        MeshGeneratorToggle.ObserveIsToggled().Subscribe(b => _meshGenerator.gameObject.SetActive(b)).AddTo(this);
         
         _researchModeData.CenterDistance.SubscribeToText(Text, f => f.ToString("F4"));
         ClearNormalsAndQuadsButton.OnClick.AddListener(HandleClearNormalsAndQuadsClicked);
@@ -96,11 +99,11 @@ public class SettingsPanelController : MonoBehaviour
             PreviewToggle.IsToggled = false;
             DepthSensorToggle.IsToggled = false;
             HandleClearNormalsAndQuadsClicked();
-            CoreServices.SpatialAwarenessSystem.Enable();
+            CoreServices.SpatialAwarenessSystem?.Enable();
         }
         else
         {
-            CoreServices.SpatialAwarenessSystem.Disable();
+            CoreServices.SpatialAwarenessSystem?.Disable();
         }
     }
 

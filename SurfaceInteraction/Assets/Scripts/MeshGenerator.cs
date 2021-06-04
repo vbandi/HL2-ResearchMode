@@ -1,14 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Tracing;
 using System.Linq;
 using DataStructures.ViliWonka.KDTree;
 using DefaultNamespace;
+using UniRx;
 using UnityEngine;
 using UnityEngine.Profiling;
-using UnityEngine.SocialPlatforms;
-using Debug = UnityEngine.Debug;
 
 // Surface mesh - a négyzethálós mesh-t simítsuk rá a point cloudra, méghozzá úgy, hogy az egyes vertexeknél elvégezzük legközelebbi x pont távolságának minimalizálását, a vertex x koordinátáját mozgatva. 
 
@@ -32,37 +31,72 @@ public class MeshGenerator : MonoBehaviour
     private KDTree _pointCloudKDTree;
     private KDQuery _query;
 
-    void Start()
+    public bool UseSampleData = true;
+
+    private bool _processing = false;
+    private IDisposable _pointCloudSubscription;
+
+    private void Start()
     {
         _mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = _mesh;
-        
-        var sampleParticleData = SampleData.PointCloud.Split(',').Select(float.Parse).ToArray();
-        
-        var size = sampleParticleData.Length / 3;
-        _pointCloud = new Vector3[size];
 
-        for (int i = 0; i < size; i++)
+        if (UseSampleData)
         {
-            var xIndex = i * 3;
+            var sampleParticleData = SampleData.PointCloud.Split(',').Select(float.Parse).ToArray();
 
-            _pointCloud[i] = new Vector3(sampleParticleData[xIndex], sampleParticleData[xIndex + 1],
-                sampleParticleData[xIndex + 2]);
+            var size = sampleParticleData.Length / 3;
+            _pointCloud = new Vector3[size];
+
+            for (int i = 0; i < size; i++)
+            {
+                var xIndex = i * 3;
+
+                _pointCloud[i] = new Vector3(sampleParticleData[xIndex], sampleParticleData[xIndex + 1],
+                    sampleParticleData[xIndex + 2]);
+            }
+
+            FindObjectOfType<PointCloudVisualizer>().SetParticles(_pointCloud, Vector3.zero);
+            ProcessPointCloud(_pointCloud);
         }
+        else
+        {
+            ObservableResearchModeData.Instance.PointCloud.Where(_ => !_processing).Subscribe(HandlePointCloudReceived);
+        }
+    }
 
-        _pointCloudKDTree = new KDTree(_pointCloud, 100);
+    private void HandlePointCloudReceived((Vector3[] pointCloud, Vector3 center) data)
+    {
+        if (_processing)
+            return;  //double check
+        
+        _processing = true;
+        CreateFlatMesh();
+        transform.SetPositionAndRotation(data.center, Quaternion.Euler(Camera.main.transform.position - data.center));
+
+        ProcessPointCloud(data.pointCloud);
+    }    
+
+    private void OnDisable()
+    {
+        _pointCloudSubscription?.Dispose();
+        _processing = false;
+    }
+
+    private void ProcessPointCloud(Vector3[] pointCloud)
+    {
+        _pointCloudKDTree = new KDTree(pointCloud, 100);
         _query = new KDQuery();
-        
-        FindObjectOfType<PointCloudVisualizer>().SetParticles(_pointCloud, Vector3.zero);
 
-        CreateShape();
+        CreateFlatMesh();
         UpdateMesh();
-        
+
         if (ExecuteSmoothMesh)
             StartCoroutine(nameof(SmoothMeshOnPointCloud));
     }
 
-    private void CreateShape()
+
+    private void CreateFlatMesh()
     {
         _vertices = new Vector3[(XSize + 1) * (ZSize + 1)];
 
@@ -118,20 +152,20 @@ public class MeshGenerator : MonoBehaviour
             }
         }
         
-        Debug.Log($"SmoothMeshOnPointCloud took {sw.ElapsedMilliseconds} ms");
-        
         UpdateMesh();
+        _processing = false;
         yield return null;
     }
 
     private Vector3 GetAverageOnPointCloud(Vector3 point, Vector3 up)
     {
+        Profiler.BeginSample(nameof(GetAverageOnPointCloud));
         var closestPointResult = new List<int>();
         _query.ClosestPoint(_pointCloudKDTree, point, closestPointResult);
         
         var closestPoints = GetClosestPoints(_pointCloud[closestPointResult.First()], _pointCloud, NumberOfPointsForAverage);
         var plane = new Plane(up, point);
-
+        
         var sum = 0f;
         for (var i = 0; i < closestPoints.Length; i++)
         {
@@ -139,6 +173,8 @@ public class MeshGenerator : MonoBehaviour
             sum += plane.GetDistanceToPoint(p);
         }
         
+        Profiler.EndSample();
+
         return new Vector3(point.x, point.y + sum / closestPoints.Length, point.z);
     }
     
@@ -163,11 +199,14 @@ public class MeshGenerator : MonoBehaviour
 
     private void UpdateMesh()
     {
+        Profiler.BeginSample(nameof(UpdateMesh));
         _mesh.Clear();
         _mesh.vertices = _vertices;
         _mesh.triangles = _triangles;
         
         _mesh.RecalculateNormals();
+        Profiler.EndSample();
     }
+
 
 }

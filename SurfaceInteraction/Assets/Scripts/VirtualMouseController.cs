@@ -112,7 +112,7 @@ public class VirtualMouseController : SurfaceDrawerBase
                 // Step 3: identify spatial mesh plane at the above intersection
                 if (isMouseDown)
                 {
-                    AddPoint(Pointer.transform.position);
+                    AddPoint(Pointer.transform.position, _meshPlane.Value);
                 }
                 else
                 {
