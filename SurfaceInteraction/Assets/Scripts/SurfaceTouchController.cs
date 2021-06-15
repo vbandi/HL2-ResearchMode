@@ -55,13 +55,16 @@ public class SurfaceTouchController : SurfaceDrawerWithPointer
             return;
         }
         
-        if (_meshPlane == null)
+        // if (_meshPlane == null)
+        // {
+        //     Pointer.SetActive(hasHit);
+        //     _meshPlane = new Plane(hit.normal, hit.point);
+        // }
+        // else
         {
-            Pointer.SetActive(hasHit);
+            Pointer.SetActive(true);
             _meshPlane = new Plane(hit.normal, hit.point);
-        }
-        else
-        {
+            
             var closestPoint = _meshPlane.Value.ClosestPointOnPlane(pose.Value.Position);
             Pointer.transform.position = closestPoint;
             

@@ -510,6 +510,11 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -0.012
       objectReference: {fileID: 0}
+    - target: {fileID: 784483377367189851, guid: ab50a48c3fc649145b33c6eac64d4888,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 784483377389828162, guid: ab50a48c3fc649145b33c6eac64d4888,
         type: 3}
       propertyPath: m_Text
@@ -519,6 +524,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.031999998
+      objectReference: {fileID: 0}
+    - target: {fileID: 784483377727678481, guid: ab50a48c3fc649145b33c6eac64d4888,
+        type: 3}
+      propertyPath: VoiceCommand
+      value: Depth Sensor
+      objectReference: {fileID: 0}
+    - target: {fileID: 784483377727678481, guid: ab50a48c3fc649145b33c6eac64d4888,
+        type: 3}
+      propertyPath: voiceRequiresFocus
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 784483377727678488, guid: ab50a48c3fc649145b33c6eac64d4888,
         type: 3}
@@ -15608,8 +15623,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Ruler: {fileID: 1384047820}
   Pointer: {fileID: 651419760}
-  PointerOffset: {x: -0.03, y: 0, z: 0.01}
-  TouchDistance: 0.005
+  PointerOffset: {x: 0, y: 0, z: 0}
+  TouchDistance: 0.01
   MaxMiddleJointDistanceFromSurface: 0.2
 --- !u!120 &1495146110
 LineRenderer:
@@ -17875,7 +17890,8 @@ GameObject:
   - component: {fileID: 1894994572}
   - component: {fileID: 1894994571}
   - component: {fileID: 1894994570}
-  m_Layer: 0
+  - component: {fileID: 1894994574}
+  m_Layer: 31
   m_Name: MeshGenerator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17960,6 +17976,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &1894994574
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1894994569}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &1897732325
 GameObject:
   m_ObjectHideFlags: 0

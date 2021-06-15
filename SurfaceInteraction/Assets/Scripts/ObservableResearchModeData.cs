@@ -276,7 +276,7 @@ public class ObservableResearchModeData : IDisposable
         var size = points.Length / 3;
 
         var comparer = new DistanceComparer(middle);
-        var result = new SortedSet<Vector3>(points, comparer).Take(count).ToArray();
+        var result = points.OrderBy(p => p, comparer).Take(count).ToArray();
         
         Profiler.EndSample();
         return result;

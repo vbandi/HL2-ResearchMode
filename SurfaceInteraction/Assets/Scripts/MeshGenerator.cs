@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using DataStructures.ViliWonka.KDTree;
 using DefaultNamespace;
+using Microsoft.MixedReality.Toolkit;
 using UniRx;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -16,6 +17,7 @@ using UnityEngine.Profiling;
 public class MeshGenerator : MonoBehaviour
 {
     private Mesh _mesh;
+    private MeshCollider _meshCollider;
     private Vector3[] _vertices;
     private int[] _triangles;
 
@@ -31,16 +33,24 @@ public class MeshGenerator : MonoBehaviour
     private KDTree _pointCloudKDTree;
     private KDQuery _query;
 
+    private Camera _mainCamera;
+
     public bool UseSampleData = true;
 
     private bool _processing = false;
     private IDisposable _pointCloudSubscription;
 
-    private void Start()
+    private void Awake()
     {
+        _mainCamera = Camera.main;
         _mesh = new Mesh();
+        _meshCollider = GetComponent<MeshCollider>();
         GetComponent<MeshFilter>().mesh = _mesh;
+        gameObject.SetActive(false);
+    }
 
+    private void OnEnable()
+    {
         if (UseSampleData)
         {
             var sampleParticleData = SampleData.PointCloud.Split(',').Select(float.Parse).ToArray();
@@ -57,22 +67,25 @@ public class MeshGenerator : MonoBehaviour
             }
 
             FindObjectOfType<PointCloudVisualizer>().SetParticles(_pointCloud, Vector3.zero);
+            // HandlePointCloudReceived((_pointCloud, _pointCloud[_pointCloud.Length / 2]));
             ProcessPointCloud(_pointCloud);
         }
         else
         {
-            ObservableResearchModeData.Instance.PointCloud.Where(_ => !_processing).Subscribe(HandlePointCloudReceived);
+            _pointCloudSubscription = ObservableResearchModeData.Instance.PointCloud
+                .Where(_ => !_processing)
+                .Subscribe(HandlePointCloudReceived);
         }
     }
-
+    
     private void HandlePointCloudReceived((Vector3[] pointCloud, Vector3 center) data)
     {
         if (_processing)
             return;  //double check
         
         _processing = true;
-        CreateFlatMesh();
-        transform.SetPositionAndRotation(data.center, Quaternion.Euler(Camera.main.transform.position - data.center));
+        
+        transform.SetPositionAndRotation(data.center, Quaternion.LookRotation(_mainCamera.transform.up, -_mainCamera.transform.forward));
 
         ProcessPointCloud(data.pointCloud);
     }    
@@ -80,6 +93,7 @@ public class MeshGenerator : MonoBehaviour
     private void OnDisable()
     {
         _pointCloudSubscription?.Dispose();
+        StopCoroutine(nameof(SmoothMeshOnPointCloud));
         _processing = false;
     }
 
@@ -87,6 +101,7 @@ public class MeshGenerator : MonoBehaviour
     {
         _pointCloudKDTree = new KDTree(pointCloud, 100);
         _query = new KDQuery();
+        _pointCloud = pointCloud;
 
         CreateFlatMesh();
         UpdateMesh();
@@ -99,12 +114,14 @@ public class MeshGenerator : MonoBehaviour
     private void CreateFlatMesh()
     {
         _vertices = new Vector3[(XSize + 1) * (ZSize + 1)];
+        var halfXSize = XSize / 2;
+        var halfZSize = ZSize / 2;
 
         for (int i = 0, z = 0; z <= ZSize; z++)
         {
             for (int x = 0; x <= XSize; x++)
             {
-                _vertices[i] = new Vector3(x, 0, z);
+                _vertices[i] = new Vector3(x - halfXSize, 0, z - halfZSize);
                 i++;
             }
         }
@@ -164,18 +181,21 @@ public class MeshGenerator : MonoBehaviour
         _query.ClosestPoint(_pointCloudKDTree, point, closestPointResult);
         
         var closestPoints = GetClosestPoints(_pointCloud[closestPointResult.First()], _pointCloud, NumberOfPointsForAverage);
-        var plane = new Plane(up, point);
+
+        // var plane = new Plane(up, point);
+        //
+        // var sum = 0f;
+        // for (var i = 0; i < closestPoints.Length; i++)
+        // {
+        //     var p = closestPoints[i];
+        //     sum += plane.GetDistanceToPoint(p);
+        // }
         
-        var sum = 0f;
-        for (var i = 0; i < closestPoints.Length; i++)
-        {
-            var p = closestPoints[i];
-            sum += plane.GetDistanceToPoint(p);
-        }
+        
         
         Profiler.EndSample();
-
-        return new Vector3(point.x, point.y + sum / closestPoints.Length, point.z);
+        return closestPoints.Average();
+        // return new Vector3(point.x, point.y + sum / closestPoints.Length, point.z);
     }
     
     // copied here so that I can optimize it separately
@@ -205,6 +225,8 @@ public class MeshGenerator : MonoBehaviour
         _mesh.triangles = _triangles;
         
         _mesh.RecalculateNormals();
+
+        _meshCollider.sharedMesh = _mesh;
         Profiler.EndSample();
     }
 
