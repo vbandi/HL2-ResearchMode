@@ -10,11 +10,9 @@ public class SurfaceTouchController : SurfaceDrawerWithPointer
 {
     private IObservable<MixedRealityPose?> _observableIndexMiddleJointPose;
 
-
     public float TouchDistance = 0.005f;
     public float MaxMiddleJointDistanceFromSurface = 0.2f;
     private Plane? _meshPlane;
-    
 
     // Start is called before the first frame update
     void Start()
@@ -77,7 +75,7 @@ public class SurfaceTouchController : SurfaceDrawerWithPointer
             if (!_meshPlane.Value.SameSide(tip.Position, pose.Value.Position) || _meshPlane.Value.GetDistanceToPoint(tip.Position) < TouchDistance)
                 AddPoint(Pointer.transform.position, _meshPlane.Value);
             else
-                points.Clear();
+                _points.Clear();
         }
     }
 }

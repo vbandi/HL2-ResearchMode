@@ -7530,8 +7530,8 @@ MonoBehaviour:
   startDimensionIndex: 0
   CanSelect: 1
   CanDeselect: 1
-  VoiceCommand: Select
-  voiceRequiresFocus: 1
+  VoiceCommand: Depth Sensor
+  voiceRequiresFocus: 0
   profiles:
   - Target: {fileID: 784483377367189851}
     Themes:

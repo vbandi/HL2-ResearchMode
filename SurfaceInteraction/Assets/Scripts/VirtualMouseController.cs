@@ -116,7 +116,7 @@ public class VirtualMouseController : SurfaceDrawerBase
                 }
                 else
                 {
-                    points.Clear();
+                    _points.Clear();
                     _mouseStatus = VirtualMouseStatus.Grabbed;
                 }
                 break;
@@ -146,9 +146,9 @@ public class VirtualMouseController : SurfaceDrawerBase
 
     public void Clear()
     {
-        points.Clear();
+        _points.Clear();
         _line.positionCount = 0;
-        _line.SetPositions(points.ToArray());
+        _line.SetPositions(_points.ToArray());
     }
 }
 

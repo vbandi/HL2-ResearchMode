@@ -105,7 +105,7 @@ namespace DefaultNamespace
                 AddPoint(Pointer.transform.position, _meshPlane.Value);
             else
             {
-                points.Clear();
+                _points.Clear();
             }
             
 //            Destroy(planeOrigin); // TODO don't do this every update

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using DefaultNamespace;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
@@ -12,14 +11,17 @@ using UnityEngine.UI;
 
 public class SettingsPanelController : MonoBehaviour
 {
-
     public Interactable SpatialMeshToggle;
     public Interactable MeshGeneratorToggle;
+    public Interactable RulerToggle;
     public Interactable DepthSensorToggle;
     public Interactable PreviewToggle;
     public Interactable ContinuousToggle;
     public Interactable ShowPointCloudToggle;
     public Interactable PointCloudSnapshotButton;
+
+    public Interactable DrawModeSelectorButton;
+    public Interactable ShowMeshToggle;
 
     public Interactable ShowNormalsToggle;
     public Interactable ShowQuadsToggle;
@@ -30,7 +32,8 @@ public class SettingsPanelController : MonoBehaviour
 
     public GameObject NormalIndicator;
     public GameObject SurfaceIndicator;
-    
+    public GameObject Ruler;
+
     public Text Text;
     public GameObject Preview;
     public MeshGenerator _meshGenerator;
@@ -70,22 +73,38 @@ public class SettingsPanelController : MonoBehaviour
         ShowQuadsToggle.ObserveIsToggled().Subscribe(HandleShowQuadsToggled).AddTo(this);
         ShowPointCloudToggle.ObserveIsToggled().Subscribe(b => PointCloudVisualizer.ShowPointCloud = b).AddTo(this);
         MeshGeneratorToggle.ObserveIsToggled().Subscribe(b => _meshGenerator.gameObject.SetActive(b)).AddTo(this);
+        ShowMeshToggle.ObserveIsToggled().Subscribe(b => _meshGenerator.GetComponent<MeshRenderer>().enabled = b).AddTo(this);
+        RulerToggle.ObserveIsToggled().Subscribe(b => Ruler.SetActive(b)).AddTo(this);
         
         _researchModeData.CenterDistance.SubscribeToText(Text, f => f.ToString("F4"));
         ClearNormalsAndQuadsButton.OnClick.AddListener(HandleClearNormalsAndQuadsClicked);
 
         SpatialMeshToggle.ObserveIsToggled().Subscribe(HandleSpatialMeshToggled);
 
-        ModeSelectorButton.NumOfDimensions = Modes.Length;
-
         Observable.EveryUpdate().Subscribe(_ =>
             _researchModeData.PauseSurfaceQuadCalculation = HandJointUtils.FindHand(Handedness.Any) != null);
         
+        // Mode selector button
+        ModeSelectorButton.NumOfDimensions = Modes.Length;
+
         foreach (GameObject mode in Modes)
             mode.SetActive(false);
 
         ModeSelectorButton.ObserveCurrentDimension().Select(x => Modes[x]).Pairwise().Subscribe(ChangeMode);
         ChangeMode(new Pair<GameObject>(null, Modes[0]));
+        
+        // Draw mode selector button
+        var drawingModeNames = Enum.GetNames(typeof(DrawingMode));
+        DrawModeSelectorButton.NumOfDimensions = drawingModeNames.Length;
+        DrawModeSelectorButton.ObserveCurrentDimension().Subscribe(x => ChangeDrawingMode((DrawingMode) x)).AddTo(this);
+    }
+
+    private void ChangeDrawingMode(DrawingMode drawingMode)
+    {
+        foreach (var surfaceDrawerBase in FindObjectsOfType<SurfaceDrawerBase>())
+            surfaceDrawerBase.DrawingMode = drawingMode;
+
+        DrawModeSelectorButton.GetComponent<ButtonConfigHelper>().MainLabelText = drawingMode.ToString();
     }
 
     private void HandleSpatialMeshToggled(bool b)

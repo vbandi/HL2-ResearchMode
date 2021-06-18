@@ -6,6 +6,8 @@ using System.Linq;
 using DataStructures.ViliWonka.KDTree;
 using DefaultNamespace;
 using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.Input;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using UniRx;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -27,6 +29,8 @@ public class MeshGenerator : MonoBehaviour
     public int NumberOfPointsForAverage = 100;
 
     public bool ExecuteSmoothMesh = true;
+
+	public bool PauseWhenHandDetected = true;
     
     private Vector3[] _pointCloud;
 
@@ -82,8 +86,9 @@ public class MeshGenerator : MonoBehaviour
     {
         if (_processing)
             return;  //double check
-        
-        _processing = true;
+
+        if (PauseWhenHandDetected && HandJointUtils.FindHand(Handedness.Any) != null)
+            return;
         
         transform.SetPositionAndRotation(data.center, Quaternion.LookRotation(_mainCamera.transform.up, -_mainCamera.transform.forward));
 
