@@ -19,6 +19,8 @@ public class SettingsPanelController : MonoBehaviour
     public Interactable ContinuousToggle;
     public Interactable ShowPointCloudToggle;
     public Interactable PointCloudSnapshotButton;
+    public Interactable LongThrowToggle;
+    public Interactable ShowCenterPointToggle;
 
     public Interactable DrawModeSelectorButton;
     public Interactable ShowMeshToggle;
@@ -33,6 +35,7 @@ public class SettingsPanelController : MonoBehaviour
     public GameObject NormalIndicator;
     public GameObject SurfaceIndicator;
     public GameObject Ruler;
+    public GameObject CenterPointIndicator;
 
     public Text Text;
     public GameObject Preview;
@@ -75,8 +78,11 @@ public class SettingsPanelController : MonoBehaviour
         MeshGeneratorToggle.ObserveIsToggled().Subscribe(b => _meshGenerator.gameObject.SetActive(b)).AddTo(this);
         ShowMeshToggle.ObserveIsToggled().Subscribe(b => _meshGenerator.GetComponent<MeshRenderer>().enabled = b).AddTo(this);
         RulerToggle.ObserveIsToggled().Subscribe(b => Ruler.SetActive(b)).AddTo(this);
+        LongThrowToggle.ObserveIsToggled().Subscribe(b => _researchModeData.LongThrowMode.Value = b).AddTo(this);
+        ShowCenterPointToggle.ObserveIsToggled().Subscribe(b => CenterPointIndicator.SetActive(b)).AddTo(this);
         
         _researchModeData.CenterDistance.SubscribeToText(Text, f => f.ToString("F4"));
+        _researchModeData.Center.Subscribe(p => CenterPointIndicator.transform.position = p);
         ClearNormalsAndQuadsButton.OnClick.AddListener(HandleClearNormalsAndQuadsClicked);
 
         SpatialMeshToggle.ObserveIsToggled().Subscribe(HandleSpatialMeshToggled);
@@ -213,10 +219,12 @@ public class SettingsPanelController : MonoBehaviour
     {
         if (b)
         {
+            LongThrowToggle.IsEnabled = false;
             _researchModeData.Start();
         }
         else
         {
+            LongThrowToggle.IsEnabled = true;
             _researchModeData.Stop();
         }
     }

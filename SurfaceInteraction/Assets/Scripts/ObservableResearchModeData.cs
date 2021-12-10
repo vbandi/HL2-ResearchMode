@@ -12,9 +12,7 @@ using UnityEngine.UIElements;
 using Logger = UniRx.Diagnostics.Logger;
 using Random = UnityEngine.Random;
 #if ENABLE_WINMD_SUPPORT
-using System.Threading.Tasks;
 using HL2UnityPlugin;
-
 #endif
 
 public class ObservableResearchModeData : IDisposable
@@ -30,6 +28,16 @@ public class ObservableResearchModeData : IDisposable
     {}
 
     private CompositeDisposable _subscriptions;
+    
+    /// <summary>
+    /// Indicated whether to use long or short throw mode
+    /// </summary>
+    public readonly BoolReactiveProperty LongThrowMode = new BoolReactiveProperty(false);
+    
+    /// <summary>
+    /// Whether research mode is running
+    /// </summary>
+    public readonly BoolReactiveProperty IsRunning = new BoolReactiveProperty(false);
     
     /// <summary>
     /// Observable stream of point detected raw point cloud and center coordinates 
@@ -106,7 +114,11 @@ public class ObservableResearchModeData : IDisposable
         try
         {
             _researchMode = new HL2ResearchMode();
-            _researchMode.InitializeDepthSensor();
+            
+            if (LongThrowMode.Value)
+                _researchMode.InitializeLongDepthSensor(); 
+            else
+                _researchMode.InitializeDepthSensor();
         }
         catch (Exception ex)
         {
@@ -120,20 +132,42 @@ public class ObservableResearchModeData : IDisposable
         IntPtr WorldOriginPtr = UnityEngine.XR.WSA.WorldManager.GetNativeISpatialCoordinateSystemPtr();
         var unityWorldOrigin = System.Runtime.InteropServices.Marshal.GetObjectForIUnknown(WorldOriginPtr) as Windows.Perception.Spatial.SpatialCoordinateSystem;
         _researchMode.SetReferenceCoordinateSystem(unityWorldOrigin);
-        _researchMode.StartDepthSensorLoop();
 
-        Observable.EveryUpdate().Subscribe(_ =>
+        if (LongThrowMode.Value)  // TODO: merge with the other if? 
+            _researchMode.StartLongDepthSensorLoop();
+        else
+            _researchMode.StartDepthSensorLoop();
+
+        Observable.EveryUpdate().Where(_ => IsRunning.Value).Subscribe(_ =>
         {
             CenterDistance.OnNext(_researchMode.GetCenterDepth());
             var c = _researchMode.GetCenterPoint();
             Center.OnNext(new Vector3(c[0], c[1], c[2]));
         }).AddTo(_subscriptions);
 
-        Observable.EveryUpdate().Where(_ => DepthMapTexture.HasObservers && _researchMode.DepthMapTextureUpdated())
-            .Subscribe(_ => HandleDepthMapTextureUpdated()).AddTo(_subscriptions);
+        if (LongThrowMode.Value)
+        {
+            Observable.EveryUpdate()
+                .Where(_ => IsRunning.Value && DepthMapTexture.HasObservers && _researchMode.LongDepthMapTextureUpdated())
+                .Subscribe(_ => HandleDepthMapTextureUpdated()).AddTo(_subscriptions);
+
+            Observable.EveryUpdate().Where(_ => IsRunning.Value && PointCloud.HasObservers &&_researchMode.LongThrowPointCloudUpdated())
+                .Subscribe(_ => HandlePointCloudUpdated(_researchMode.GetCenterPoint(), _researchMode.GetLongThrowPointCloudBuffer()))
+                .AddTo(_subscriptions);
+        }
+        else
+        {
+            Observable.EveryUpdate()
+                .Where(_ => IsRunning.Value && DepthMapTexture.HasObservers && _researchMode.DepthMapTextureUpdated())
+                .Subscribe(_ => HandleDepthMapTextureUpdated()).AddTo(_subscriptions);
+
+            Observable.EveryUpdate().Where(_ => IsRunning.Value && PointCloud.HasObservers && _researchMode.PointCloudUpdated())
+                .Subscribe(_ => HandlePointCloudUpdated(_researchMode.GetCenterPoint(), _researchMode.GetPointCloudBuffer()))
+                .AddTo(_subscriptions);
+        }
         
-        Observable.EveryUpdate().Where(_ => PointCloud.HasObservers && _researchMode.PointCloudUpdated())
-            .Subscribe(_ => HandlePointCloudUpdated(_researchMode.GetCenterPoint(), _researchMode.GetPointCloudBuffer())).AddTo(_subscriptions);
+        IsRunning.Value = true;
+        
 #endif
     }
 
@@ -156,7 +190,7 @@ public class ObservableResearchModeData : IDisposable
     {
         
 #if ENABLE_WINMD_SUPPORT
-        DepthMapTexture.OnNext(_researchMode.GetDepthMapTextureBuffer());
+        DepthMapTexture.OnNext(LongThrowMode.Value ? _researchMode.GetLongDepthMapTextureBuffer() : _researchMode.GetDepthMapTextureBuffer());
 #endif
 
     }
@@ -285,6 +319,7 @@ public class ObservableResearchModeData : IDisposable
     public void Stop()
     {
         Debug.Log("Stopping research mode");
+        IsRunning.Value = false;
         _subscriptions?.Dispose();
         
 #if ENABLE_WINMD_SUPPORT
