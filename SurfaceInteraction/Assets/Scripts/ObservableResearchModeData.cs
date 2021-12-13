@@ -318,15 +318,27 @@ public class ObservableResearchModeData : IDisposable
 
     public void Stop()
     {
-        Debug.Log("Stopping research mode");
-        IsRunning.Value = false;
-        _subscriptions?.Dispose();
-        
+        try
+        {
+
+            Debug.Log("Stopping research mode");
+            IsRunning.Value = false;
+            _subscriptions?.Dispose();
+            Debug.Log("Subscriptions disposed");
+            
+
 #if ENABLE_WINMD_SUPPORT
-        _researchMode?.StopAllSensorDevice();
-        _researchMode = null;
+            Debug.Log("StopAllSensorDevice() start");
+            _researchMode?.StopAllSensorDevice();
+            Debug.Log("StopAllSensorDevice() done");
+            _researchMode = null;
 #endif
-        
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error!" + e);  
+            throw;
+        }
     }
 
     // ReSharper disable Unity.PerformanceAnalysis
